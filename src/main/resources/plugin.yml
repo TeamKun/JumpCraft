@@ -2,3 +2,8 @@ name: JumpCraft
 version: ${project.version}
 main: net.kunmc.lab.jumpcraft.JumpCraft
 api-version: 1.16
+commands:
+  jumpCraft:
+    description: jumpCraft.
+    usage: /<jumpCraft>
+    permission: op
