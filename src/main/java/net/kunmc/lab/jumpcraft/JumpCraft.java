@@ -16,7 +16,7 @@ public final class JumpCraft extends JavaPlugin {
     private boolean isPause = false;
     private boolean isReverseBar = false;
     private boolean isFinish = false;
-    private String winnerName = "";
+    private String winnerName = "a";
     private int winnerPoint = 0;
     private double barPosZAdder = 0;
 
