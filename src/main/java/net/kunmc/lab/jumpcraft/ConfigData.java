@@ -17,8 +17,8 @@ public class ConfigData {
     private int widthZ = 30;
     private double height = 100;
     private Material block1 = Material.WHITE_CONCRETE;
-    private Material block2 = Material.BLACK_CONCRETE;
-    private Material block3 = Material.RED_CONCRETE;
+    private Material block2 = Material.GRAY_CONCRETE;
+    private Material block3 = Material.BLACK_CONCRETE;
     private double barSpeed = 1;
     private boolean isBattleRoyalMode = false;
 

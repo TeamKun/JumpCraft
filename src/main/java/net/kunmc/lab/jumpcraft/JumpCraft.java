@@ -16,7 +16,7 @@ public final class JumpCraft extends JavaPlugin {
     private boolean isPause = false;
     private boolean isReverseBar = false;
     private boolean isFinish = false;
-    private String winnerName = "a";
+    private String winnerName = "";
     private int winnerPoint = 0;
     private double barPosZAdder = 0;
 
@@ -99,7 +99,7 @@ public final class JumpCraft extends JavaPlugin {
                 if(!isStart) {
                     return;
                 }
-                setBar();
+                setBarAndCheckPlayerStates();
                 if(ConfigData.getINSTANCE().isBattleRoyalMode() && !isFinish) {
                     checkIsFinish();
                 }
@@ -112,18 +112,48 @@ public final class JumpCraft extends JavaPlugin {
                 if(isPause) {
                     return;
                 }
-                checkPlayerState();
                 setBarPositionAndAddPoint();
             }
         },0L, 2L);
     }
 
-    private void setBar() {
+    private void setBarAndCheckPlayerStates() {
         Location boxLoc = BoxGenerator.getINSTANCE().getBoxLoc();
+        if(ConfigData.getINSTANCE().getBarSpeed() >= 1.5) {
+            int count = 0;
+            double adder = ConfigData.getINSTANCE().getBarSpeed();
+            double temp = barPosZAdder;
+            while (adder >= 0.5) {
+                adder -= 0.5;
+                count++;
+            }
+            for (int i = 0; i < count; i++) {
+                barPosZAdder += 0.5;
+                checkIsFinishAndPlayerStates();
+            }
+            barPosZAdder = temp;
+            addBarPosZ(boxLoc);
+            checkIsFinishAndPlayerStates();
+            return;
+        }
+        addBarPosZ(boxLoc);
+        checkIsFinishAndPlayerStates();
+    }
+
+    private void addBarPosZ(Location boxLoc) {
         for(double barPosXAdder = 0; barPosXAdder < ConfigData.getINSTANCE().getWidthX(); barPosXAdder += 0.1) {
             boxLoc.add(barPosXAdder,1.5,barPosZAdder);
-            boxLoc.getWorld().spawnParticle(Particle.SWEEP_ATTACK,boxLoc,1,0,0,0,0);
-            boxLoc.subtract(barPosXAdder,1.5,barPosZAdder);
+            boxLoc.getWorld().spawnParticle(Particle.SWEEP_ATTACK, boxLoc, 1, 0, 0, 0, 0);
+            boxLoc.subtract(barPosXAdder,1.5, barPosZAdder);
+        }
+    }
+
+    private void checkIsFinishAndPlayerStates() {
+        if(ConfigData.getINSTANCE().isBattleRoyalMode() && !isFinish) {
+            checkIsFinish();
+        }
+        if(!isFinish && !isPause) {
+            checkPlayerState();
         }
     }
 
@@ -142,10 +172,10 @@ public final class JumpCraft extends JavaPlugin {
             fixPlayerPosition(player);
             Location boxLoc = BoxGenerator.getINSTANCE().getBoxLoc();
             double barPosZ = boxLoc.getZ() + barPosZAdder;
-            double barPosY = boxLoc.getY() + 1.5;
+            double barPosY = boxLoc.getY() + 2;
             double playerPosZ = player.getLocation().getZ();
             double playerPosY = player.getLocation().getY();
-            if(barPosZ + 1 >= playerPosZ && playerPosZ >= barPosZ - 1) {
+            if(barPosZ + 0.5 >= playerPosZ && playerPosZ >= barPosZ - 0.5) {
                 if(barPosY >= playerPosY) {
                     player.sendMessage("§cあなたは当たりました");
                     pInfo.get(player.getUniqueId()).setDead(true);
@@ -262,15 +292,16 @@ public final class JumpCraft extends JavaPlugin {
         pInfo = new HashMap<>();
         int addZ = configData.getWidthZ() % 2 == 0 ? configData.getWidthZ() / 2 : (configData.getWidthZ() + 1) / 2;
         List<Player> players = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
-        for (Player player : players) {
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
             if(player.isDead() || !player.isValid() || player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
-                boxLoc.add(1.5, 1, addZ);
+                boxLoc.add(i + 1.5, 1, addZ);
             } else {
-                player.teleport(boxLoc.add(1.5, 1, addZ));
+                player.teleport(boxLoc.add(i + 1.5, 1, addZ));
             }
             player.setFireTicks(0);
-            pInfo.put(player.getUniqueId(), new PlayerInfo((int) boxLoc.getX(), (int) boxLoc.getZ(), boxLoc));
-            boxLoc.subtract(1.5, 1, addZ);
+            pInfo.put(player.getUniqueId(), new PlayerInfo(boxLoc));
+            boxLoc.subtract(i + 1.5, 1, addZ);
             player.sendMessage("§a" + "5秒後にゲームを開始します");
         }
         isPreparing = true;
