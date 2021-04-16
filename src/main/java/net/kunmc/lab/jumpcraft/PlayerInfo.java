@@ -6,11 +6,13 @@ public class PlayerInfo {
     private boolean isDead;
     private int point;
     private final Location loc;
+    private String teamName;
 
-    PlayerInfo(Location loc) {
+    PlayerInfo(Location loc, String teamName) {
         isDead = false;
         point = 0;
         this.loc = new Location(loc.getWorld(),loc.getX() ,loc.getY(),loc.getZ());
+        this.teamName = teamName;
     }
 
     public boolean isDead() {
@@ -31,5 +33,13 @@ public class PlayerInfo {
 
     public Location getLoc() {
         return loc;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 }

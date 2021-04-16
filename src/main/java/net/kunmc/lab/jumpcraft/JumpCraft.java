@@ -16,6 +16,7 @@ public final class JumpCraft extends JavaPlugin {
     private boolean isPause = false;
     private boolean isReverseBar = false;
     private boolean isFinish = false;
+    private boolean isNoTeam = false;
     private String winnerName = "";
     private int winnerPoint = 0;
     private double barPosZAdder = 0;
@@ -79,6 +80,7 @@ public final class JumpCraft extends JavaPlugin {
         new CommandListener();
         new ConfigData();
         new BoxGenerator();
+        new ScoreBoard();
         gameTask();
     }
 
@@ -159,13 +161,7 @@ public final class JumpCraft extends JavaPlugin {
 
     private void checkPlayerState() {
         Bukkit.getServer().getOnlinePlayers().forEach(player -> {
-            if(!pInfo.containsKey(player.getUniqueId())) {
-                return;
-            }
-            if(player.isDead() || !player.isValid() || player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
-                return;
-            }
-            if(pInfo.get(player.getUniqueId()).isDead()) {
+            if(isNotPlayerValid(player)) {
                 return;
             }
             player.sendActionBar(Component.text("§6" + pInfo.get(player.getUniqueId()).getPoint()));
@@ -178,22 +174,50 @@ public final class JumpCraft extends JavaPlugin {
             if(barPosZ + 0.5 >= playerPosZ && playerPosZ >= barPosZ - 0.5) {
                 if(barPosY >= playerPosY) {
                     player.sendMessage("§cあなたは当たりました");
-                    pInfo.get(player.getUniqueId()).setDead(true);
                     if(ConfigData.getINSTANCE().isBattleRoyalMode()) {
-                        for (int addZ = 0; addZ < ConfigData.getINSTANCE().getWidthZ(); addZ++) {
-                            player.getWorld().getBlockAt((int) pInfo.get(player.getUniqueId()).getLoc().getX() - 1, (int) boxLoc.getY(), (int) boxLoc.getZ() + addZ).setType(Material.AIR);
-                            player.teleport(pInfo.get(player.getUniqueId()).getLoc());
-                        }
+                        pInfo.get(player.getUniqueId()).setDead(true);
+                        destroyPlayersFloor(player, boxLoc);
                     } else {
-                        player.setFireTicks(1000);
-                        isFinish = true;
-                        winnerName = "§c" + "戦犯: " + player.getName();
-                        winnerPoint = pInfo.get(player.getUniqueId()).getPoint();
-                        playSound(Sound.ENTITY_BLAZE_DEATH);
+                        if(isNoTeam) {
+                            player.setFireTicks(1000);
+                            isFinish = true;
+                            winnerName = "§c" + "戦犯: " + player.getName();
+                            winnerPoint = pInfo.get(player.getUniqueId()).getPoint();
+                            playSound(Sound.ENTITY_BLAZE_DEATH);
+                            return;
+                        }
+                        String teamName = pInfo.get(player.getUniqueId()).getTeamName();
+                        Bukkit.getServer().getOnlinePlayers().forEach(p -> {
+                            if(isNotPlayerValid(p)) {
+                                return;
+                            }
+                            if(pInfo.get(p.getUniqueId()).getTeamName().equals(teamName)) {
+                                pInfo.get(player.getUniqueId()).setDead(true);
+                                destroyPlayersFloor(player, boxLoc);
+                            }
+                        });
+                        checkIsFinish();
                     }
                 }
             }
         });
+    }
+
+    private boolean isNotPlayerValid(Player player) {
+        if(!pInfo.containsKey(player.getUniqueId())) {
+            return true;
+        }
+        if(player.isDead() || !player.isValid() || player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+            return true;
+        }
+        return pInfo.get(player.getUniqueId()).isDead();
+    }
+
+    private void destroyPlayersFloor(Player player, Location boxLoc) {
+        for (int addZ = 0; addZ < ConfigData.getINSTANCE().getWidthZ(); addZ++) {
+            player.getWorld().getBlockAt((int) pInfo.get(player.getUniqueId()).getLoc().getX() - 1, (int) boxLoc.getY(), (int) boxLoc.getZ() + addZ).setType(Material.AIR);
+            player.teleport(pInfo.get(player.getUniqueId()).getLoc());
+        }
     }
 
     private void fixPlayerPosition(Player player) {
@@ -233,6 +257,7 @@ public final class JumpCraft extends JavaPlugin {
     private void checkIsFinish() {
         List<Player> players = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
         int count = 0;
+        String winTeam = "empty";
         for (Player player: players) {
             if(!pInfo.containsKey(player.getUniqueId())) {
                 return;
@@ -241,9 +266,20 @@ public final class JumpCraft extends JavaPlugin {
                 return;
             }
             if(!pInfo.get(player.getUniqueId()).isDead()) {
-                winnerName = "§6" + "勝者: " + player.getName();
-                winnerPoint = pInfo.get(player.getUniqueId()).getPoint();
-                count++;
+                if(isNoTeam) {
+                    winnerName = "§6" + "勝者: " + player.getName();
+                    winnerPoint = pInfo.get(player.getUniqueId()).getPoint();
+                    count++;
+                } else {
+                    if(winTeam.equals("empty")) {
+                        winTeam = pInfo.get(player.getUniqueId()).getTeamName();
+                        winnerName = "§6" + "勝者: " + winTeam;
+                        winnerPoint = pInfo.get(player.getUniqueId()).getPoint();
+                        count = 1;
+                    } else if (!winTeam.equals(pInfo.get(player.getUniqueId()).getTeamName())) {
+                        count = 0;
+                    }
+                }
             }
         }
         if(count == 1) {
@@ -289,6 +325,7 @@ public final class JumpCraft extends JavaPlugin {
     private void preparePlayer() {
         ConfigData configData = ConfigData.getINSTANCE();
         Location boxLoc = BoxGenerator.getINSTANCE().getBoxLoc();
+        isNoTeam = false;
         pInfo = new HashMap<>();
         int addZ = configData.getWidthZ() % 2 == 0 ? configData.getWidthZ() / 2 : (configData.getWidthZ() + 1) / 2;
         List<Player> players = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
@@ -300,7 +337,11 @@ public final class JumpCraft extends JavaPlugin {
                 player.teleport(boxLoc.add(i + 1.5, 1, addZ));
             }
             player.setFireTicks(0);
-            pInfo.put(player.getUniqueId(), new PlayerInfo(boxLoc));
+            String teamName = ScoreBoard.getINSTANCE().getPlayersTeamName(player.getName());
+            pInfo.put(player.getUniqueId(), new PlayerInfo(boxLoc, teamName));
+            if(teamName.equals("empty") || players.size() == 1) {
+                isNoTeam = true;
+            }
             boxLoc.subtract(i + 1.5, 1, addZ);
             player.sendMessage("§a" + "5秒後にゲームを開始します");
         }
