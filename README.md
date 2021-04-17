@@ -20,10 +20,12 @@
 - config  
   - set  
     - barSpeed  数値(0<n<boxLength)  
-      バーのスピードの設定
+      バーのスピードの設定(デフォルト1)
     - battleRoyalMode true or false  
-      バトルロイヤルモードの設定  
+      バトルロイヤルモードの設定(デフォルトfalse)
+    - zFixMode true or false  
+      z軸の固定の設定(デフォルトtrue)
     - boxLength  数値(5以上)  
-      ステージの長さの設定
+      ステージの長さの設定(デフォルト30)
   - show   
     コンフィグの確認
