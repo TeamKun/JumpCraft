@@ -21,6 +21,7 @@ public class ConfigData {
     private Material block3 = Material.BLACK_CONCRETE;
     private double barSpeed = 1;
     private boolean isBattleRoyalMode = false;
+    private boolean isZFixMode = true;
 
     public int getWidthX() {
         return widthX;
@@ -68,5 +69,13 @@ public class ConfigData {
 
     public void setBattleRoyalMode(boolean battleRoyalMode) {
         isBattleRoyalMode = battleRoyalMode;
+    }
+
+    public boolean isZFixMode() {
+        return isZFixMode;
+    }
+
+    public void setZFixMode(boolean ZFixMode) {
+        isZFixMode = ZFixMode;
     }
 }

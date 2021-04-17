@@ -27,9 +27,7 @@ public class PlayerInfo {
         return point;
     }
 
-    public void addPoint() {
-        point++;
-    }
+    public void addPoint() { point++; }
 
     public Location getLoc() {
         return loc;
@@ -37,9 +35,5 @@ public class PlayerInfo {
 
     public String getTeamName() {
         return teamName;
-    }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
     }
 }

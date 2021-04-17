@@ -95,6 +95,7 @@ public final class JumpCraft extends JavaPlugin {
                                 return;
                             }
                            fixPlayerPosition(player);
+                            displayScoreboard();
                         }
                     });
                 }
@@ -102,7 +103,8 @@ public final class JumpCraft extends JavaPlugin {
                     return;
                 }
                 setBarAndCheckPlayerStates();
-                if(ConfigData.getINSTANCE().isBattleRoyalMode() && !isFinish) {
+                displayScoreboard();
+                if((ConfigData.getINSTANCE().isBattleRoyalMode() || !isNoTeam) && !isFinish) {
                     checkIsFinish();
                 }
                 if(isFinish) {
@@ -119,6 +121,16 @@ public final class JumpCraft extends JavaPlugin {
         },0L, 2L);
     }
 
+    private void displayScoreboard() {
+        if(ConfigData.getINSTANCE().isBattleRoyalMode()) {
+            ScoreBoard.getINSTANCE().disPlayScoreBoard(pInfo,3);
+        } else if(isNoTeam) {
+            ScoreBoard.getINSTANCE().disPlayScoreBoard(pInfo,1);
+        } else {
+            ScoreBoard.getINSTANCE().disPlayScoreBoard(pInfo,2);
+        }
+    }
+
     private void setBarAndCheckPlayerStates() {
         Location boxLoc = BoxGenerator.getINSTANCE().getBoxLoc();
         if(ConfigData.getINSTANCE().getBarSpeed() >= 1.5) {
@@ -130,7 +142,12 @@ public final class JumpCraft extends JavaPlugin {
                 count++;
             }
             for (int i = 0; i < count; i++) {
-                barPosZAdder += 0.5;
+                if(isReverseBar) {
+                    barPosZAdder += 0.5;
+                } else {
+                    barPosZAdder -= 0.5;
+                }
+
                 checkIsFinishAndPlayerStates();
             }
             barPosZAdder = temp;
@@ -164,7 +181,10 @@ public final class JumpCraft extends JavaPlugin {
             if(isNotPlayerValid(player)) {
                 return;
             }
-            player.sendActionBar(Component.text("§6" + pInfo.get(player.getUniqueId()).getPoint()));
+            int point = pInfo.get(player.getUniqueId()).getPoint();
+            if (point != 0 && point % 10 == 0) {
+                player.sendActionBar(Component.text("§6" + "Excellent!"));
+            }
             fixPlayerPosition(player);
             Location boxLoc = BoxGenerator.getINSTANCE().getBoxLoc();
             double barPosZ = boxLoc.getZ() + barPosZAdder;
@@ -221,9 +241,15 @@ public final class JumpCraft extends JavaPlugin {
     }
 
     private void fixPlayerPosition(Player player) {
-        int  diffX = (int) player.getLocation().getX() - (int) pInfo.get(player.getUniqueId()).getLoc().getX();
+        int diffX = (int) player.getLocation().getX() - (int) pInfo.get(player.getUniqueId()).getLoc().getX();
         if (diffX != 0) {
-            player.setVelocity(player.getVelocity().add((new Vector(diffX * -1,0,0)).normalize().multiply(0.2)));
+            player.setVelocity(player.getVelocity().add((new Vector(diffX * -1, 0, 0)).normalize().multiply(0.2)));
+        }
+        if(ConfigData.getINSTANCE().isZFixMode()) {
+            int diffZ = (int) player.getLocation().getZ() - (int) pInfo.get(player.getUniqueId()).getLoc().getZ();
+            if (diffZ != 0) {
+                player.setVelocity(player.getVelocity().add((new Vector(0, 0, diffZ * -1)).normalize().multiply(0.2)));
+            }
         }
         if(pInfo.get(player.getUniqueId()).getLoc().getY() >= player.getLocation().getY() + 5) {
             player.teleport(pInfo.get(player.getUniqueId()).getLoc());
@@ -339,7 +365,7 @@ public final class JumpCraft extends JavaPlugin {
             player.setFireTicks(0);
             String teamName = ScoreBoard.getINSTANCE().getPlayersTeamName(player.getName());
             pInfo.put(player.getUniqueId(), new PlayerInfo(boxLoc, teamName));
-            if(teamName.equals("empty") || players.size() == 1) {
+            if(teamName.equals("empty")) {
                 isNoTeam = true;
             }
             boxLoc.subtract(i + 1.5, 1, addZ);

@@ -96,6 +96,7 @@ public class CommandListener implements TabExecutor {
                 sender.sendMessage("§a" + "barSpeed: " +ConfigData.getINSTANCE().getBarSpeed());
                 sender.sendMessage("§a" + "boxLength: " +ConfigData.getINSTANCE().getWidthZ());
                 sender.sendMessage("§a" + "battleRoyalMode: " +ConfigData.getINSTANCE().isBattleRoyalMode());
+                sender.sendMessage("§a" + "zFixMode: " +ConfigData.getINSTANCE().isZFixMode());
                 return true;
             }
             if(args[1].equals("set")) {
@@ -104,12 +105,22 @@ public class CommandListener implements TabExecutor {
                     sender.sendMessage("§c"+ "barSpeed 0 < n < boxLength");
                     sender.sendMessage("§c"+ "boxLength 5以上/ゲーム進行中は変更不可");
                     sender.sendMessage("§c"+ "battleRoyalMode true or false");
+                    sender.sendMessage("§c"+ "zFixMode true or false");
                     return true;
                 }
                 if(args[2].equals("battleRoyalMode")) {
                     if(args[3].equals("true") || args[3].equals("false")) {
                         ConfigData.getINSTANCE().setBattleRoyalMode(Boolean.parseBoolean(args[3]));
                         sender.sendMessage("§a"+ "battleRoyalModeを" + args[3] + "にしました");
+                        return true;
+                    }
+                    sender.sendMessage("§c"+ "引数は true or false にしてください");
+                    return true;
+                }
+                if(args[2].equals("zFixMode")) {
+                    if(args[3].equals("true") || args[3].equals("false")) {
+                        ConfigData.getINSTANCE().setZFixMode(Boolean.parseBoolean(args[3]));
+                        sender.sendMessage("§a"+ "zFixModeを" + args[3] + "にしました");
                         return true;
                     }
                     sender.sendMessage("§c"+ "引数は true or false にしてください");
@@ -168,13 +179,16 @@ public class CommandListener implements TabExecutor {
             if(args.length == 1) {
                 return Stream.of("start","finish","pause","unpause","config").filter(e -> e.startsWith(args[0])).collect(Collectors.toList());
             }
-            if(args.length == 2 && args[0].equals("config")) {
+            if(args.length >= 2 && !args[0].equals("config")) {
+                return null;
+            }
+            if(args.length == 2) {
                 return Stream.of("set", "show").filter(e -> e.startsWith(args[1])).collect(Collectors.toList());
             }
             if(args.length == 3 && args[1].equals("set")) {
-                return Stream.of("battleRoyalMode","barSpeed","boxLength").filter(e -> e.startsWith(args[2])).collect(Collectors.toList());
+                return Stream.of("battleRoyalMode","zFixMode","barSpeed","boxLength").filter(e -> e.startsWith(args[2])).collect(Collectors.toList());
             }
-            if(args.length == 4 && args[2].equals("battleRoyalMode")) {
+            if(args.length == 4 && args[2].equals("battleRoyalMode") || args[2].equals("zFixMode")) {
                 return Stream.of("true","false").filter(e -> e.startsWith(args[3])).collect(Collectors.toList());
             }
             if(args.length == 4 && args[2].equals("barSpeed")) {
