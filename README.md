@@ -21,9 +21,11 @@
   - set  
     - barSpeed  数値(0<n<boxLength)  
       バーのスピードの設定(デフォルト1)
+    - teamMode true or false  
+      チームモードの設定(デフォルトfalse)
     - battleRoyalMode true or false  
       バトルロイヤルモードの設定(デフォルトfalse)
-    - zFixMode true or false  
+    - shouldZFix true or false  
       z軸の固定の設定(デフォルトtrue)
     - boxLength  数値(5以上)  
       ステージの長さの設定(デフォルト30)
