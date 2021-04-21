@@ -182,7 +182,6 @@ public class PlayerManager {
                     continue;
                 }
                 if(playerMap.get(id).isDead()) {
-                    count--;
                     continue;
                 }
                 JumpCraft.instance.setWinMessage("§6" + "勝者" + player.getName(), "Point" + playerMap.get(id).getPoint());
@@ -196,7 +195,7 @@ public class PlayerManager {
                     count--;
                     continue;
                 }
-                JumpCraft.instance.setWinMessage("§6" + "勝者" + teamName + count,"Point" + teamMap.get(teamName).getPoint());
+                JumpCraft.instance.setWinMessage("§6" + "勝者" + teamName,"Point" + teamMap.get(teamName).getPoint());
             }
             return count == 1;
         }

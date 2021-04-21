@@ -110,7 +110,7 @@ public final class JumpCraft extends JavaPlugin {
                         stageManager.moveBar(0);
                         return;
                     }
-                    playerManager.fixPos(configManager.isTeamMode(),configManager.isZFix());
+                    playerManager.fixPos(configManager.isTeamMode() && !configManager.isBattleRoyalMode(),configManager.isZFix());
                     playerManager.checkHitBar(
                             stageManager.getBar().getY(),
                             stageManager.getBar().getZ(),
@@ -119,7 +119,7 @@ public final class JumpCraft extends JavaPlugin {
                             configManager.isBattleRoyalMode());
                     boolean shouldAddPoint = stageManager.moveBar(configManager.getSpeed());
                     if(shouldAddPoint) {
-                        playerManager.addPoint(configManager.isTeamMode());
+                        playerManager.addPoint(configManager.isTeamMode() && !configManager.isBattleRoyalMode());
                     }
                 }
             }
