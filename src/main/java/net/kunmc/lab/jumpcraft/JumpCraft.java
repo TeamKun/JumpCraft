@@ -129,5 +129,6 @@ public final class JumpCraft extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        finishGame();
     }
 }
