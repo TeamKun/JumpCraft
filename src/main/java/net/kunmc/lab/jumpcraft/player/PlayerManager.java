@@ -37,10 +37,6 @@ public class PlayerManager {
                 .setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
-    public Map<UUID, PlayerData> getPlayerMap() {
-        return playerMap;
-    }
-
     public void setPlayerMap(List<Player> players, boolean isTeamMode) {
         playerMap = new HashMap<>();
         teamMap = new HashMap<>();
@@ -51,6 +47,7 @@ public class PlayerManager {
                 for(Team team : Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeams()) {
                     if(team.hasEntry(player.getName())) {
                         teamName = team.getName();
+                        break;
                     }
                 }
                 if(!teamMap.containsKey(teamName)) {
@@ -107,7 +104,7 @@ public class PlayerManager {
                         break;
                     }
                 }
-                if(isHitBar || teamData.getMembers().stream().noneMatch(player -> (!player.isOnline() || player.isDead() || !player.isValid()))) {
+                if(isHitBar || teamData.getMembers().stream().anyMatch(player -> (!player.isOnline() || player.isDead() || !player.isValid()))) {
                     teamData.setDead(true);
                     teamData.getMembers().forEach(this::killPLayer);
                 }
@@ -193,12 +190,13 @@ public class PlayerManager {
             return count == 1;
         }
         if(isTeamMode) {
-            int count = teamMap.size();
+            int count = teamMap.keySet().size();
             for(String teamName : teamMap.keySet()) {
                 if(teamMap.get(teamName).isDead()) {
                     count--;
+                    continue;
                 }
-                JumpCraft.instance.setWinMessage("§6" + "勝者" + teamName,"Point" + teamMap.get(teamName).getPoint());
+                JumpCraft.instance.setWinMessage("§6" + "勝者" + teamName + count,"Point" + teamMap.get(teamName).getPoint());
             }
             return count == 1;
         }
@@ -244,18 +242,21 @@ public class PlayerManager {
         }
         int diffX = (int) player.getLocation().getX() -  (stage.getX() + 1);
         if(diffX != 0) {
-            player.setVelocity(player.getVelocity().add(new Vector(diffX * -1,0,0).normalize().multiply(0.2)));
+            //player.setVelocity(player.getVelocity().add(new Vector(diffX * -1,0,0).normalize().multiply(0.2)));
+            forceTp(player,stage);
         }
         if(isZFix){
             int diffZ = (int) player.getLocation().getZ() - stage.getcZ();
             if(diffZ != 0) {
-                player.setVelocity(player.getVelocity().add(new Vector(0,0,diffZ * -1).normalize().multiply(0.2)));
+                //player.setVelocity(player.getVelocity().add(new Vector(0,0,diffZ * -1).normalize().multiply(0.2)));
+                forceTp(player,stage);
             }
         }
     }
 
     private void forceTp(Player player,Stage stage) {
-        player.teleport(new Location(player.getWorld(),stage.getX() + 0.5,stage.getY() + 1,stage.getcZ()));
+        Vector dir = player.getLocation().getDirection();
+        player.teleport(new Location(player.getWorld(),stage.getX() + 0.5,stage.getY() + 1,stage.getcZ()).setDirection(dir));
     }
 
     public void displayScore(boolean isTeamMode, boolean isBattleMode) {
