@@ -33,7 +33,7 @@ public class GameManager {
         isFinish = false;
         players.forEach(player -> {
             Stage stage = stageMap.get(player.getUniqueId());
-            player.teleport(new Location(player.getWorld(),stage.getX() + 0.5,stage.getY() + 1,stage.getcZ()));
+            player.teleport(new Location(player.getWorld(),stage.getX() + 0.5,stage.getY() + 1,stage.getCZ()));
             player.sendMessage("§a" + "5秒後にゲームを開始します");
         });
         Bukkit.getServer().getScheduler().runTaskLater(JumpCraft.instance, new Runnable() {

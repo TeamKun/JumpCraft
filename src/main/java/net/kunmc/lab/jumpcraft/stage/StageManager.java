@@ -3,6 +3,7 @@ package net.kunmc.lab.jumpcraft.stage;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -35,8 +36,8 @@ public class StageManager {
     }
 
     private void setBlock(UUID id, int x, int y, int fz, int length) {
-        stageMap.put(id,new Stage(x,y,fz,length));
         Material block = x % 2 == 0 ? Material.GRAY_CONCRETE : Material.WHITE_CONCRETE;
+        stageMap.put(id,new Stage(x,y,fz,length,block));
         for(int z = fz; z < length + fz; z++) {
             world.getBlockAt(x,y,z).setType(block);
         }
@@ -87,7 +88,20 @@ public class StageManager {
             world.getBlockAt(stage.getX(),stage.getY(),z)
                     .setType(Material.AIR);
         }
+    }
 
+    public void generate(UUID id) {
+        if(world == null) {return;}
+        if(!stageMap.containsKey(id)) {
+            return;
+        }
+        Stage stage = stageMap.get(id);
+        for(int z = stage.getFz(); z < stage.getLz(); z++) {
+            Block block = world.getBlockAt(stage.getX(),stage.getY(),z);
+            if(block.getType() == Material.AIR) {
+                block.setType(stage.getBlock());
+            }
+        }
     }
 
     public void destroyAllStage() {

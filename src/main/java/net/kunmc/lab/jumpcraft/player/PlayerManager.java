@@ -182,6 +182,7 @@ public class PlayerManager {
                     continue;
                 }
                 if(playerMap.get(id).isDead()) {
+                    count--;
                     continue;
                 }
                 JumpCraft.instance.setWinMessage("§6" + "勝者" + player.getName(), "Point" + playerMap.get(id).getPoint());
@@ -215,6 +216,9 @@ public class PlayerManager {
     public void fixPos(boolean isTeamMode, boolean isZFix) {
         if(isTeamMode) {
             for(TeamData teamData : teamMap.values()) {
+                if(teamData.isDead()) {
+                    continue;
+                }
                 teamData.getMembers().forEach(player -> {
                     fix(player,isZFix);
                 });
@@ -226,6 +230,9 @@ public class PlayerManager {
             if(player == null) {
                 continue;
             }
+            if(playerMap.get(id).isDead()) {
+                continue;
+            }
             fix(player,isZFix);
         }
     }
@@ -235,6 +242,7 @@ public class PlayerManager {
         if(stage == null) {
             return;
         }
+        StageManager.instance.generate(player.getUniqueId());
         if(stage.getY() > player.getLocation().getY() + 5) {
             forceTp(player,stage);
             return;
@@ -245,7 +253,7 @@ public class PlayerManager {
             forceTp(player,stage);
         }
         if(isZFix){
-            int diffZ = (int) player.getLocation().getZ() - stage.getcZ();
+            int diffZ = (int) player.getLocation().getZ() - stage.getCZ();
             if(diffZ != 0) {
                 //player.setVelocity(player.getVelocity().add(new Vector(0,0,diffZ * -1).normalize().multiply(0.2)));
                 forceTp(player,stage);
@@ -255,7 +263,7 @@ public class PlayerManager {
 
     private void forceTp(Player player,Stage stage) {
         Vector dir = player.getLocation().getDirection();
-        player.teleport(new Location(player.getWorld(),stage.getX() + 0.5,stage.getY() + 1,stage.getcZ()).setDirection(dir));
+        player.teleport(new Location(player.getWorld(),stage.getX() + 0.5,stage.getY() + 1,stage.getCZ()).setDirection(dir));
     }
 
     public void displayScore(boolean isTeamMode, boolean isBattleMode) {

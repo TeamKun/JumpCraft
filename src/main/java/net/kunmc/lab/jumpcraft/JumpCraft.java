@@ -106,11 +106,11 @@ public final class JumpCraft extends JavaPlugin {
                         gameManager.sendFinishMessage();
                         return;
                     }
+                    playerManager.fixPos(configManager.isTeamMode() && !configManager.isBattleRoyalMode(),configManager.isZFix());
                     if(gameManager.isPause()) {
                         stageManager.moveBar(0);
                         return;
                     }
-                    playerManager.fixPos(configManager.isTeamMode() && !configManager.isBattleRoyalMode(),configManager.isZFix());
                     playerManager.checkHitBar(
                             stageManager.getBar().getY(),
                             stageManager.getBar().getZ(),
