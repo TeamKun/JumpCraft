@@ -101,11 +101,13 @@ public class PlayerManager {
                 for (Player player : teamData.getMembers()) {
                     isHitBar = isHitBar(y, z, speed,player);
                     if(isHitBar) {
+                        player.sendMessage("§c" + "当たりました");
                         break;
                     }
                 }
                 if(isHitBar || teamData.getMembers().stream().anyMatch(player -> (!player.isOnline() || player.isDead() || !player.isValid()))) {
                     teamData.setDead(true);
+                    teamData.getMembers().forEach(player -> player.sendMessage("§c" + "メンバーが当たりました"));
                     teamData.getMembers().forEach(this::killPLayer);
                 }
             }
@@ -133,6 +135,7 @@ public class PlayerManager {
             boolean isHitBar = isHitBar(y,z,speed,player);
             if(isHitBar) {
                 playerData.setDead(true);
+                player.sendMessage("§c" + "当たりました");
                 killPLayer(player);
             }
         }
@@ -150,11 +153,11 @@ public class PlayerManager {
             s += Math.min(speed, 0.5);
             speed -= Math.min(speed, 0.5);
             if(isReverse) {
-                if(z + s + 0.5 >= pz && pz >= z + s - 0.5) {
+                if(z + s + 0.2 >= pz && pz >= z + s - 0.2) {
                     return true;
                 }
             } else {
-                if(z - s + 0.5 >= pz && pz >= z - s - 0.5) {
+                if(z - s + 0.2 >= pz && pz >= z - s - 0.2) {
                     return true;
                 }
             }
