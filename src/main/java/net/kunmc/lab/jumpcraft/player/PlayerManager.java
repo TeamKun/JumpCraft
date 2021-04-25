@@ -53,6 +53,7 @@ public class PlayerManager {
                 if(!teamMap.containsKey(teamName)) {
                     teamMap.put(teamName,new TeamData());
                 }
+                teamMap.get(teamName).addMember(player);
             }
             return;
         }
@@ -94,7 +95,7 @@ public class PlayerManager {
                 }
                 TeamData teamData = teamMap.get(teamName);
                 if(teamData.isDead()) {
-                    return;
+                    continue;
                 }
                 boolean isHitBar = false;
                 for (Player player : teamData.getMembers()) {
@@ -119,17 +120,17 @@ public class PlayerManager {
             }
             PlayerData playerData = playerMap.get(id);
             if(playerData.isDead()) {
-                return;
+                continue;
             }
             Player player = Bukkit.getServer().getPlayer(id);
             if(player == null) {
                 playerData.setDead(true);
-                return;
+                continue;
             }
             if(!player.isOnline() || player.isDead() || !player.isValid()) {
                 playerData.setDead(true);
                 killPLayer(player);
-                return;
+                continue;
             }
             boolean isHitBar = isHitBar(y,z,speed,player);
             if(isHitBar) {
