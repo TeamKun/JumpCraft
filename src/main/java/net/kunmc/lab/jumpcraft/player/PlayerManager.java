@@ -53,7 +53,6 @@ public class PlayerManager {
                 if(!teamMap.containsKey(teamName)) {
                     teamMap.put(teamName,new TeamData());
                 }
-                teamMap.get(teamName).addMember(player);
             }
             return;
         }
@@ -153,11 +152,11 @@ public class PlayerManager {
             s += Math.min(speed, 0.5);
             speed -= Math.min(speed, 0.5);
             if(isReverse) {
-                if(z + s + 0.2 >= pz && pz >= z + s - 0.2) {
+                if(z + s + 0.3 >= pz && pz >= z + s - 0.3) {
                     return true;
                 }
             } else {
-                if(z - s + 0.2 >= pz && pz >= z - s - 0.2) {
+                if(z - s + 0.3 >= pz && pz >= z - s - 0.3) {
                     return true;
                 }
             }
