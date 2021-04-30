@@ -99,30 +99,27 @@ public final class JumpCraft extends JavaPlugin {
     }
 
     private void task() {
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if(gameManager.isStart()) {
-                    playerManager.displayScore(configManager.isTeamMode(),configManager.isBattleRoyalMode());
-                    if(gameManager.isFinish()) {
-                        gameManager.sendFinishMessage();
-                        return;
-                    }
-                    playerManager.fixPos(configManager.isTeamMode() && !configManager.isBattleRoyalMode(),configManager.isZFix());
-                    if(gameManager.isPause()) {
-                        stageManager.moveBar(0);
-                        return;
-                    }
-                    playerManager.checkHitBar(
-                            stageManager.getBar().getY(),
-                            stageManager.getBar().getZ(),
-                            configManager.getSpeed(),
-                            configManager.isTeamMode() && !configManager.isBattleRoyalMode(),
-                            configManager.isBattleRoyalMode());
-                    boolean shouldAddPoint = stageManager.moveBar(configManager.getSpeed());
-                    if(shouldAddPoint) {
-                        playerManager.addPoint(configManager.isTeamMode() && !configManager.isBattleRoyalMode());
-                    }
+        Bukkit.getServer().getScheduler().runTaskTimer(this, bukkitTask -> {
+            if(gameManager.isStart()) {
+                playerManager.displayScore(configManager.isTeamMode(),configManager.isBattleRoyalMode());
+                if(gameManager.isFinish()) {
+                    gameManager.sendFinishMessage();
+                    return;
+                }
+                playerManager.fixPos(configManager.isTeamMode() && !configManager.isBattleRoyalMode(),configManager.isZFix());
+                if(gameManager.isPause()) {
+                    stageManager.moveBar(0);
+                    return;
+                }
+                playerManager.checkHitBar(
+                        stageManager.getBar().getY(),
+                        stageManager.getBar().getZ(),
+                        configManager.getSpeed(),
+                        configManager.isTeamMode() && !configManager.isBattleRoyalMode(),
+                        configManager.isBattleRoyalMode());
+                boolean shouldAddPoint = stageManager.moveBar(configManager.getSpeed());
+                if(shouldAddPoint) {
+                    playerManager.addPoint(configManager.isTeamMode() && !configManager.isBattleRoyalMode());
                 }
             }
         },0L,2L);
