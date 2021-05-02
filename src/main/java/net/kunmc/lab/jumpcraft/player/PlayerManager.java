@@ -250,7 +250,7 @@ public class PlayerManager {
             forceTp(player,stage);
             return;
         }
-        int diffX = (int) player.getLocation().getX() -  (stage.getX() + 1);
+        int diffX = (int) player.getLocation().getX() -  (int)(stage.getX() + 0.5);
         if(diffX != 0) {
             //player.setVelocity(player.getVelocity().add(new Vector(diffX * -1,0,0).normalize().multiply(0.2)));
             forceTp(player,stage);
