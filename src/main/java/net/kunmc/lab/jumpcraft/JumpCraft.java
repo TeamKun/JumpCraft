@@ -36,7 +36,9 @@ public final class JumpCraft extends JavaPlugin {
                     return;
                 }
                 gameManager.checkIsFinish();
-                gameManager.moveBarAndAddPoint(false);
+                if(!gameManager.isFinish()) {
+                    gameManager.moveBarAndAddPoint(false);
+                }
             }
         },0,2);
     }

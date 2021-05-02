@@ -1,6 +1,7 @@
 package net.kunmc.lab.jumpcraft.player;
 
 import net.kunmc.lab.jumpcraft.ConfigManager;
+import net.kunmc.lab.jumpcraft.stage.Stage;
 import net.kunmc.lab.jumpcraft.stage.StageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,6 +32,9 @@ public class PlayerManager implements PlayerManagerIF{
         if(!ConfigManager.instance.isBattleRoyalMode() && !ConfigManager.instance.isTeamMode()) {
             if(isHit) {
                 stageManager.destroyStage(player.getUniqueId());
+                Stage stage = stageManager.getStageMap().get(player.getUniqueId());
+                player.teleport(player.getLocation().set(stage.getX() + 0.5, stage.getY() + 1, stage.getCenterZ())
+                        .setDirection(player.getLocation().getDirection()));
                 player.sendMessage("§c" + "当たりました");
                 return Stream.of("§c" + "戦犯" + player.getName(), "Point:" + playerMap.get(id).getPoint()).collect(Collectors.toList());
             }
@@ -40,10 +44,13 @@ public class PlayerManager implements PlayerManagerIF{
             if(isHit) {
                 playerMap.get(id).setDead(true);
                 stageManager.destroyStage(player.getUniqueId());
+                Stage stage = stageManager.getStageMap().get(player.getUniqueId());
+                player.teleport(player.getLocation().set(stage.getX() + 0.5, stage.getY() + 1, stage.getCenterZ())
+                        .setDirection(player.getLocation().getDirection()));
             }
             return null;
         }
-        return Stream.of("§6" + "勝者" + player.getName(),String.valueOf(playerMap.get(id).getPoint())).collect(Collectors.toList());
+        return Stream.of("§6" + "勝者" + player.getName(),"Point:" + playerMap.get(id).getPoint()).collect(Collectors.toList());
     }
 
     public List<Player> getAlivePlayers(List<Player> players) {

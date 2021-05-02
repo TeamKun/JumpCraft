@@ -1,5 +1,6 @@
 package net.kunmc.lab.jumpcraft.player;
 
+import net.kunmc.lab.jumpcraft.stage.Stage;
 import net.kunmc.lab.jumpcraft.stage.StageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -49,6 +50,9 @@ public class TeamManager implements PlayerManagerIF {
                 teamData.setDead(true);
                 teamData.getMembers().forEach(member -> {
                     stageManager.destroyStage(member.getUniqueId());
+                    Stage stage = stageManager.getStageMap().get(player.getUniqueId());
+                    player.teleport(player.getLocation().set(stage.getX() + 0.5, stage.getY() + 1, stage.getCenterZ())
+                            .setDirection(player.getLocation().getDirection()));
                     if (!member.equals(player)) {
                         member.sendMessage("§c" + "メンバーが当たりました");
                     }

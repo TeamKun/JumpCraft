@@ -184,8 +184,8 @@ public class GameManager {
         players.forEach(player -> {
             stageManager.fixStage(player.getUniqueId());
             Stage stage = stageManager.getStageMap().get(player.getUniqueId());
-            int diffX = (int) player.getLocation().getX() - (stage.getX() + 1);
-            int diffZ = (int) player.getLocation().getZ() - stage.getCenterZ();
+            int diffX = (int) player.getLocation().getX() - stage.getpPosX();
+            int diffZ = ((int) player.getLocation().getZ()) - (stage.getCenterZ());
             if(diffX != 0 || (ConfigManager.instance.isZFix()) && diffZ != 0) {
                 player.teleport(player.getLocation().set(stage.getX() + 0.5, stage.getY() + 1, stage.getCenterZ())
                 .setDirection(player.getLocation().getDirection()));

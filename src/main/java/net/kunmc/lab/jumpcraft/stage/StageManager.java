@@ -16,20 +16,20 @@ public class StageManager {
         stageMap = new HashMap<>();
         bar = new Bar(x + 0.5, x + players.size() + 1.5, y + 1.5, firstZ, lastZ, lastZ, true, world);
         UUID id = UUID.randomUUID();
-        setBlock(id,x,y,firstZ,centerZ,lastZ,world);
+        setBlock(id,x,y,firstZ,centerZ,lastZ,world,x);
         x++;
         for (Player player : players) {
             id = player.getUniqueId();
-            setBlock(id,x,y,firstZ,centerZ,lastZ,world);
+            setBlock(id,x,y,firstZ,centerZ,lastZ,world, (int) (x + 0.5));
             x++;
         }
         id = UUID.randomUUID();
-        setBlock(id,x,y,firstZ,centerZ,lastZ,world);
+        setBlock(id,x,y,firstZ,centerZ,lastZ,world,x);
     }
 
-    private void setBlock(UUID id, int x, int y, int firstZ, int centerZ, int lastZ, World world) {
+    private void setBlock(UUID id, int x, int y, int firstZ, int centerZ, int lastZ, World world, int pPosX) {
         Material block = x % 2 == 0 ? Material.GRAY_CONCRETE : Material.WHITE_CONCRETE;
-        stageMap.put(id, new Stage(x,y,firstZ,centerZ,lastZ,block));
+        stageMap.put(id, new Stage(x,y,firstZ,centerZ,lastZ,block, pPosX));
         Stage stage = stageMap.get(id);
         for(int z = firstZ; z  <= lastZ; z++) {
             Block b = world.getBlockAt(x,y,z);

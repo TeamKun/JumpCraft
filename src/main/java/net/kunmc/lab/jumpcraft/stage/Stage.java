@@ -14,8 +14,9 @@ public class Stage {
     private final int lastZ;
     private final Material block;
     private final List<Block> blocks;
+    private final int pPosX;
 
-    public Stage(int x, int y, int firstZ, int centerZ, int lastZ, Material block) {
+    public Stage(int x, int y, int firstZ, int centerZ, int lastZ, Material block, int pPosX) {
         this.x = x;
         this.y = y;
         this.firstZ = firstZ;
@@ -23,6 +24,7 @@ public class Stage {
         this.lastZ = lastZ;
         this.block = block;
         blocks = new ArrayList<>();
+        this.pPosX = pPosX;
     }
 
     public int getX() {
@@ -51,5 +53,9 @@ public class Stage {
 
     public List<Block> getBlocks() {
         return blocks;
+    }
+
+    public int getpPosX() {
+        return pPosX;
     }
 }
