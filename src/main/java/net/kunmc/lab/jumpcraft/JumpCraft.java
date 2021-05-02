@@ -72,7 +72,9 @@ public final class JumpCraft extends JavaPlugin {
     }
 
     public boolean finishGame() {
-        gameManager.finishGame();
+        if(gameManager != null) {
+            gameManager.finishGame();
+        }
         return true;
     }
 
@@ -82,6 +84,8 @@ public final class JumpCraft extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        gameManager.finishGame();
+        if(gameManager != null) {
+            gameManager.finishGame();
+        }
     }
 }
