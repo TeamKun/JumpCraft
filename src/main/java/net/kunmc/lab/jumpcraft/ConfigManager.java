@@ -2,13 +2,20 @@ package net.kunmc.lab.jumpcraft;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+
 public class ConfigManager {
     public static ConfigManager instance;
     private int length = 30;
     private double speed = 1;
     private boolean isBattleRoyalMode = false;
     private boolean isTeamMode = false;
+    private boolean isXFix = true;
     private boolean isZFix = true;
+    private Set<String> blackList = new HashSet<>();
 
     public ConfigManager() {
         instance = this;
@@ -46,6 +53,14 @@ public class ConfigManager {
         isTeamMode = teamMode;
     }
 
+    public boolean isXFix() {
+        return isXFix;
+    }
+
+    public void setXFix(boolean XFix) {
+        isXFix = XFix;
+    }
+
     public boolean isZFix() {
         return isZFix;
     }
@@ -54,12 +69,23 @@ public class ConfigManager {
         isZFix = ZFix;
     }
 
+    public Set<String> getBlackList() {
+        return blackList;
+    }
+
+    public void setBlackList(Set<String> blackList) {
+        this.blackList = blackList;
+    }
+
     public void show(CommandSender sender) {
         sender.sendMessage("§a" + "barSpeed: " + getSpeed());
         sender.sendMessage("§a" + "stageLength: " + getLength());
+        sender.sendMessage("§a" + "shouldXFix" + isXFix());
         sender.sendMessage("§a" + "shouldZFix" + isZFix());
         sender.sendMessage("§a" + "teamMode: " + isTeamMode());
         sender.sendMessage("§a" + "battleRoyalMode: " + isBattleRoyalMode());
+        String names = new ArrayList<>(getBlackList()).toString();
+        sender.sendMessage("§a" + "blackList: " + names.substring(1,names.length() - 1));
     }
 
     public boolean set(String item, String content) {
@@ -94,6 +120,13 @@ public class ConfigManager {
             case "shouldZFix":
                 if(content.equals("true") || content.equals("false")) {
                     setZFix(Boolean.parseBoolean(content));
+                } else {
+                    result = false;
+                }
+                break;
+            case "shouldXFix":
+                if(content.equals("true") || content.equals("false")) {
+                    setXFix(Boolean.parseBoolean(content));
                 } else {
                     result = false;
                 }

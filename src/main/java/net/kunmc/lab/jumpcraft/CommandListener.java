@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,9 +77,11 @@ public class CommandListener implements TabExecutor {
                     sender.sendMessage("§c"+ "barSpeed 0 < n < boxLength");
                     sender.sendMessage("§6" + "以下ゲーム進行中は変更不可");
                     sender.sendMessage("§c"+ "stageLength 5以上");
+                    sender.sendMessage("§c"+ "shouldXFix true or false");
                     sender.sendMessage("§c"+ "shouldZFix true or false");
                     sender.sendMessage("§c"+ "teamMode true or false");
                     sender.sendMessage("§c"+ "battleRoyalMode true or false");
+                    sender.sendMessage("§c"+ "blackList add Player or remove Player or removeAll");
                     return true;
                 }
                 if(args[2].equals("barSpeed")) {
@@ -90,7 +93,7 @@ public class CommandListener implements TabExecutor {
                     sender.sendMessage("§c"+ "barSpeed 0 < n < boxLength");
                     return true;
                 }
-                if(args[2].equals("stageLength") || args[2].equals("shouldZFix")
+                if(args[2].equals("stageLength") || args[2].equals("shouldZFix") || args[2].equals("shouldXFix")
                         || args[2].equals("teamMode") || args[2].equals("battleRoyalMode")) {
                     if(!JumpCraft.instance.isNotStart()) {
                         sender.sendMessage("§c" + args[2] + "はゲーム進行中に変更することはできません");
@@ -106,7 +109,8 @@ public class CommandListener implements TabExecutor {
                     sender.sendMessage("§c"+ "stageLength 5以上");
                     return true;
                 }
-                if(args[2].equals("shouldZFix")) {
+                if(args[2].equals("shouldZFix") || args[2].equals("shouldXFix")
+                        || args[2].equals("teamMode") || args[2].equals("battleRoyalMode")) {
                     if(ConfigManager.instance.set(args[2],args[3])) {
                         sender.sendMessage("§a" + args[2] + "を" + args[3] + "にしました");
                         return true;
@@ -114,21 +118,33 @@ public class CommandListener implements TabExecutor {
                     sender.sendMessage("§c"+ "trueかfalseを入力してください");
                     return true;
                 }
-                if(args[2].equals("teamMode")) {
-                    if(ConfigManager.instance.set(args[2],args[3])) {
-                        sender.sendMessage("§a" + args[2] + "を" + args[3] + "にしました");
+                if(args[2].equals("blackList")) {
+                    if(args[3].equals("removeAll")) {
+                        ConfigManager.instance.setBlackList(new HashSet<>());
+                        sender.sendMessage("§a" + args[2] + "を空にしました");
                         return true;
                     }
-                    sender.sendMessage("§c"+ "trueかfalseを入力してください");
-                    return true;
-                }
-                if(args[2].equals("battleRoyalMode")) {
-                    if(ConfigManager.instance.set(args[2],args[3])) {
-                        sender.sendMessage("§a" + args[2] + "を" + args[3] + "にしました");
+                    if(args.length < 5) {
+                        sender.sendMessage("§c"+ "引数が足りません");
+                        sender.sendMessage("§c"+ "blackList add Player or remove Player or removeAll");
                         return true;
                     }
-                    sender.sendMessage("§c"+ "trueかfalseを入力してください");
-                    return true;
+                    if(args[3].equals("add")) {
+                        if(ConfigManager.instance.getBlackList().add(args[4])) {
+                            sender.sendMessage("§a" + args[2] + "に" + args[4] + "を追加しました");
+                            return true;
+                        }
+                        sender.sendMessage("§c" + args[2] + "に" + args[4] + "はすでに追加されています");
+                        return true;
+                    }
+                    if(args[3].equals("remove")) {
+                        if(ConfigManager.instance.getBlackList().remove(args[4])) {
+                            sender.sendMessage("§a" + args[2] + "から" + args[4] + "を取り除きました");
+                            return true;
+                        }
+                        sender.sendMessage("§c" + args[2] + "に" + args[4] + "は追加されていません");
+                        return true;
+                    }
                 }
             }
         }
@@ -148,9 +164,9 @@ public class CommandListener implements TabExecutor {
                 return Stream.of("set", "show").filter(e -> e.startsWith(args[1])).collect(Collectors.toList());
             }
             if(args.length == 3 && args[1].equals("set")) {
-                return Stream.of("teamMode","battleRoyalMode","shouldZFix","barSpeed","stageLength").filter(e -> e.startsWith(args[2])).collect(Collectors.toList());
+                return Stream.of("teamMode","battleRoyalMode","shouldXFix","shouldZFix","barSpeed","stageLength", "blackList").filter(e -> e.startsWith(args[2])).collect(Collectors.toList());
             }
-            if(args.length == 4 && args[2].equals("battleRoyalMode") || args[2].equals("shouldZFix") || args[2].equals("teamMode")) {
+            if(args.length == 4 && args[2].equals("battleRoyalMode") || args[2].equals("shouldZFix") || args[2].equals("shouldXFix") || args[2].equals("teamMode")) {
                 return Stream.of("true","false").filter(e -> e.startsWith(args[3])).collect(Collectors.toList());
             }
             if(args.length == 4 && args[2].equals("barSpeed")) {
@@ -159,6 +175,24 @@ public class CommandListener implements TabExecutor {
             if(args.length == 4 && args[2].equals("stageLength")) {
                 return Stream.of("5","10","20","30","50").filter(e -> e.startsWith(args[3])).collect(Collectors.toList());
             }
+            if(args.length == 4 && args[2].equals("blackList")) {
+                return Stream.of("add","remove","removeAll").filter(e -> e.startsWith(args[3])).collect(Collectors.toList());
+            }
+            if(args.length == 5 && args[3].equals("add")) {
+                return Bukkit.getServer().getOnlinePlayers().stream()
+                        .map(Player::getName)
+                        .filter(name -> !ConfigManager.instance.getBlackList().contains(name))
+                        .filter(e -> e.startsWith(args[4]))
+                        .collect(Collectors.toList());
+            }
+            if(args.length == 5 && args[3].equals("remove")) {
+                return Bukkit.getServer().getOnlinePlayers().stream()
+                        .map(Player::getName)
+                        .filter(name -> ConfigManager.instance.getBlackList().contains(name))
+                        .filter(e -> e.startsWith(args[4]))
+                        .collect(Collectors.toList());
+            }
+
         }
         return null;
     }

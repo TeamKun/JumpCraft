@@ -4,6 +4,13 @@ package net.kunmc.lab.jumpcraft;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 public final class JumpCraft extends JavaPlugin {
     static JumpCraft instance;
@@ -44,6 +51,11 @@ public final class JumpCraft extends JavaPlugin {
     }
 
     public void startGame(Player sender) {
+        List<Player> players;
+        players = Bukkit.getServer().getOnlinePlayers().stream().filter(player -> !ConfigManager.instance.getBlackList().contains(player.getName())).collect(Collectors.toList());
+        if(players.size() == 0) {
+            return;
+        }
         gameManager = new GameManager(
                 (int) sender.getLocation().getX(),
                 100,
@@ -51,7 +63,8 @@ public final class JumpCraft extends JavaPlugin {
                 (int) (sender.getLocation().getZ() + (ConfigManager.instance.getLength() / 2)),
                 (int) (sender.getLocation().getZ() + ConfigManager.instance.getLength()),
                 sender.getWorld(),
-                ConfigManager.instance.isBattleRoyalMode() ? 2 : ConfigManager.instance.isTeamMode() ? 3 : 1
+                ConfigManager.instance.isBattleRoyalMode() ? 2 : ConfigManager.instance.isTeamMode() ? 3 : 1,
+                players
         );
     }
 

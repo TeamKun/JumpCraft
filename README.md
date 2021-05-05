@@ -27,7 +27,15 @@
       バトルロイヤルモードの設定(デフォルトfalse)
     - shouldZFix true or false  
       z軸の固定の設定(デフォルトtrue)
+    - shouldXFix true or false  
+      x軸の固定の設定(デフォルトtrue)
     - boxLength  数値(5以上)  
       ステージの長さの設定(デフォルト30)
+    - blackList add PLayer  
+      ブラックリストにプレイヤーを追加
+    - blackList remove Player  
+      ブラックリストのプレイヤーを削除
+    - blackList removeAll  
+      ブラックリストを空にする
   - show   
     コンフィグの確認

@@ -15,7 +15,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,17 +41,17 @@ public class GameManager {
         return isFinish;
     }
 
-    public GameManager(int x, int y, int firstZ, int centerZ, int lastZ, World world, int gameMode) {
-        startGame(x, y, firstZ, centerZ, lastZ, world, gameMode);
+    public GameManager(int x, int y, int firstZ, int centerZ, int lastZ, World world, int gameMode, List<Player> players) {
+        startGame(x, y, firstZ, centerZ, lastZ, world, gameMode, players);
     }
 
-    private void init(int x, int y, int firstZ, int centerZ, int lastZ, World world, int gameMode) {
+    private void init(int x, int y, int firstZ, int centerZ, int lastZ, World world, int gameMode, List<Player> players) {
+        this.players = players;
         isStart = true;
         isFinish = false;
         isPause = true;
         winMassage = new String[2];
         this.gameMode = gameMode;
-        players = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
         stageManager = new StageManager(x, y, firstZ, centerZ, lastZ, world, players);
         playerManagerIF = gameMode == 3 ? new TeamManager(players) : new PlayerManager(players);
         scoreboard = Bukkit.getServer().getScoreboardManager().getNewScoreboard();
@@ -60,11 +59,11 @@ public class GameManager {
                 .setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
-    public void startGame(int x, int y, int firstZ, int centerZ, int lastZ, World world, int gameMode) {
+    public void startGame(int x, int y, int firstZ, int centerZ, int lastZ, World world, int gameMode, List<Player> players) {
         if(stageManager != null) {
             stageManager.destroyAllStage();
         }
-        init(x, y, firstZ, centerZ, lastZ, world, gameMode);
+        init(x, y, firstZ, centerZ, lastZ, world, gameMode, players);
         players.forEach(player -> {
             Stage stage = stageManager.getStageMap().get(player.getUniqueId());
             player.teleport(player.getLocation().set(stage.getX() + 0.5,stage.getY() + 1, stage.getCenterZ()).setDirection(
@@ -186,9 +185,9 @@ public class GameManager {
             Stage stage = stageManager.getStageMap().get(player.getUniqueId());
             int diffX = (int) player.getLocation().getX() - stage.getpPosX();
             int diffZ = ((int) player.getLocation().getZ()) - (stage.getCenterZ());
-            if(diffX != 0 || (ConfigManager.instance.isZFix()) && diffZ != 0) {
+            if((ConfigManager.instance.isXFix()) &&  diffX != 0 || (ConfigManager.instance.isZFix()) && diffZ != 0 || stage.getY() + 1 > (int) player.getLocation().getY() + 10) {
                 player.teleport(player.getLocation().set(stage.getX() + 0.5, stage.getY() + 1, stage.getCenterZ())
-                .setDirection(player.getLocation().getDirection()));
+                        .setDirection(player.getLocation().getDirection()));
             }
         });
     }
